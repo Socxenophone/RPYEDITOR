@@ -1,9 +1,9 @@
 // Initialize Ace Editor
 const editor = ace.edit("editor");
 editor.setTheme("ace/theme/monokai");
-editor.session.setMode("ace/mode/python"); // Python mode is close enough for Ren'Py syntax
+editor.session.setMode("ace/mode/python"); // Python mode for syntax highlighting
 
-// Sample .rpy script for testing
+// Sample script
 const sampleScript = `
 label start:
     character Alice "Alice":
@@ -15,22 +15,33 @@ label start:
 
 editor.setValue(sampleScript);
 
-// Function to interpret and run the script
-function runScript(script) {
-    const lines = script.split("\n");
-    let currentLabel = null;
-    let currentCharacter = null;
+// Save script to localStorage and navigate to dialogue.html
+document.getElementById("run-script").addEventListener("click", function() {
+    const script = editor.getValue();
+    localStorage.setItem('rpyScript', script); // Save the script
+    window.location.href = 'dialogue.html';    // Navigate to dialogue page
+});
 
-    // Clear dialogue display
-    const characterNameElem = document.getElementById("character-name");
-    const dialogueTextElem = document.getElementById("dialogue-text");
+// Function to interpret and run the script from localStorage
+function runScript() {
+    const script = localStorage.getItem('rpyScript');
+    if (!script) {
+        alert("No script found!");
+        return;
+    }
+
+    const lines = script.split("\n");
+    let currentCharacter = null;
+    let currentLabel = null;
+    let dialogueContentElem = document.getElementById("dialogue-content");
 
     let i = 0;
+    let choices = [];
 
     function displayNextLine() {
         if (i >= lines.length) return;
 
-        const line = lines[i].trim();
+        let line = lines[i].trim();
         i++;
 
         if (line.startsWith("label")) {
@@ -50,19 +61,70 @@ function runScript(script) {
             const dialogueMatch = line.match(/"(.+?)"/);
             if (dialogueMatch) {
                 const dialogue = dialogueMatch[1];
-                characterNameElem.textContent = currentCharacter || "Narrator";
-                dialogueTextElem.textContent = dialogue;
+                const dialogueText = `<p><strong>${currentCharacter || "Narrator"}:</strong> ${dialogue}</p>`;
+                dialogueContentElem.innerHTML += dialogueText; // Append new dialogue
+            }
+        } else if (line.startsWith("menu:")) {
+            // Handle choices (menu)
+            let choice = parseChoices(lines, i);
+            if (choice) {
+                displayChoices(choice);
+                return; // Wait for choice selection
             }
         }
 
         setTimeout(displayNextLine, 3000); // Display next line after 3 seconds
     }
 
+    function parseChoices(lines, startIndex) {
+        let choices = [];
+        let idx = startIndex;
+        while (idx < lines.length) {
+            let line = lines[idx].trim();
+            idx++;
+
+            if (line.startsWith('"')) {
+                const choiceMatch = line.match(/"(.+?)"/);
+                if (choiceMatch) {
+                    choices.push(choiceMatch[1]);
+                }
+            } else if (line.startsWith("jump")) {
+                break;
+            }
+        }
+        return choices.length ? { choices, nextIndex: idx } : null;
+    }
+
+    function displayChoices(choiceObj) {
+        dialogueContentElem.innerHTML += `<div class="choices"></div>`;
+        const choicesDiv = document.querySelector(".choices");
+
+        choiceObj.choices.forEach((choice, index) => {
+            const choiceButton = document.createElement("button");
+            choiceButton.innerHTML = choice;
+            choiceButton.className = "btn btn-choice";
+            choiceButton.onclick = () => selectChoice(index, choiceObj.nextIndex);
+            choicesDiv.appendChild(choiceButton);
+        });
+    }
+
+    function selectChoice(index, nextIndex) {
+        document.querySelector(".choices").remove();
+        i = nextIndex; // Continue from after the choices block
+        displayNextLine();
+    }
+
     displayNextLine();
 }
 
-// Run the script when button is clicked
-document.getElementById("run-script").addEventListener("click", function() {
-    const script = editor.getValue();
-    runScript(script);
-});
+// Run script when the dialogue page loads
+if (window.location.pathname.endsWith('dialogue.html')) {
+    runScript();
+}
+
+// Button to go back to editor
+if (document.getElementById("back-to-editor")) {
+    document.getElementById("back-to-editor").addEventListener("click", function() {
+        window.location.href = 'index.html';
+    });
+}
