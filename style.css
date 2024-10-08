@@ -1,0 +1,41 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+.editor {
+    width: 100%;
+    height: 300px;
+    border: 1px solid #ddd;
+    margin-bottom: 20px;
+}
+
+.dialogue-box {
+    margin-top: 20px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    background-color: #f8f9fa;
+}
+
+#character-name {
+    font-weight: bold;
+    font-size: 1.5rem;
+}
+
+#dialogue-text {
+    font-size: 1.2rem;
+}
+
+@media only screen and (max-width: 600px) {
+    .editor {
+        height: 200px;
+    }
+
+    #character-name {
+        font-size: 1.2rem;
+    }
+
+    #dialogue-text {
+        font-size: 1rem;
+    }
+}
+ 
