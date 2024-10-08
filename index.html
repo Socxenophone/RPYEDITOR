@@ -8,23 +8,12 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h1 class="text-center">Ren'Py Script Editor</h1>
 
-        <!-- Script Editor -->
-        <div id="editor" class="editor"></div>
+    <!-- Fullscreen Editor -->
+    <div id="editor" class="editor"></div>
 
-        <!-- Controls for running the script -->
-        <div class="controls text-center">
-            <button id="run-script" class="btn btn-primary">Run Script</button>
-        </div>
-
-        <!-- Dialogue Display -->
-        <div id="dialogue-box" class="dialogue-box">
-            <h2 id="character-name"></h2>
-            <p id="dialogue-text"></p>
-        </div>
-    </div>
+    <!-- Floating Run Button -->
+    <button id="run-script" class="floating-btn btn btn-primary">Run</button>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
     <script src="script.js"></script>
