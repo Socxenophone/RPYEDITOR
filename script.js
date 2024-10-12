@@ -1,27 +1,3 @@
-// Initialize Ace Editor
-const editor = ace.edit("editor");
-editor.setTheme("ace/theme/monokai");
-editor.session.setMode("ace/mode/python"); // Python mode for syntax highlighting
-
-// Sample script
-const sampleScript = `
-label start:
-    character Alice "Alice":
-    "Hi, I'm Alice. How are you?"
-    character Bob "Bob":
-    "Hello Alice! I'm doing well!"
-    "What about you?"
-`;
-
-editor.setValue(sampleScript);
-
-// Save script to localStorage and navigate to dialogue.html
-document.getElementById("run-script").addEventListener("click", function() {
-    const script = editor.getValue();
-    localStorage.setItem('rpyScript', script); // Save the script
-    window.location.href = 'dialogue.html';    // Navigate to dialogue page
-});
-
 // Function to interpret and run the script from localStorage
 function runScript() {
     const script = localStorage.getItem('rpyScript');
@@ -36,7 +12,6 @@ function runScript() {
     let dialogueContentElem = document.getElementById("dialogue-content");
 
     let i = 0;
-    let choices = [];
 
     function displayNextLine() {
         if (i >= lines.length) return;
@@ -52,13 +27,13 @@ function runScript() {
             }
         } else if (line.startsWith("character")) {
             // Parse character name
-            const charMatch = line.match(/character (\w+) "(.+)":/);
+            const charMatch = line.match(/character (\w+) "(.+)"/);
             if (charMatch) {
                 currentCharacter = charMatch[2];
             }
         } else if (line.startsWith('"')) {
             // Parse dialogue
-            const dialogueMatch = line.match(/"(.+?)"/);
+            const dialogueMatch = line.match(/^"(.+?)"$/); // Ensure dialogue is within quotes
             if (dialogueMatch) {
                 const dialogue = dialogueMatch[1];
                 const dialogueText = `<p><strong>${currentCharacter || "Narrator"}:</strong> ${dialogue}</p>`;
